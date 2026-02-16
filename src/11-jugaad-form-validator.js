@@ -63,4 +63,60 @@
  */
 export function validateForm(formData) {
   // Your code here
+
+  let errors = {};
+
+  if (
+    formData.name.trim() === "" ||
+    formData.name.length < 2 ||
+    formData.name.length > 50
+  ) {
+    errors.name = "Name must be 2-50 characters";
+  }
+
+  if (
+    typeof formData.email !== "string" ||
+    formData.email.indexOf("@") === -1 ||
+    formData.email.indexOf("@") !== formData.email.lastIndexOf("@") ||
+    !formData.email.split("@")[1].includes(".")
+  ) {
+    errors.email = "Invalid email format";
+  }
+
+  if (
+    typeof formData.phone !== "string" ||
+    !/^[6-9]\d{9}$/.test(formData.phone)
+  ) {
+    errors.phone = "Invalid Indian phone number";
+  }
+
+  let age = Number(formData.age);
+
+  if (!Number.isInteger(age) || age < 16 || age > 100) {
+    errors.age = "Age must be an integer between 16 and 100";
+  }
+
+  if (
+    typeof formData.pincode !== "string" ||
+    formData.pincode.length !== 6 ||
+    formData.pincode.startsWith("0") ||
+    /[a-zA-Z]/.test(formData.pincode)
+  ) {
+    errors.pincode = "Invalid Indian pincode";
+  }
+
+  let state = formData?.state ?? "";
+
+  if (typeof state !== "string" || state === "") {
+    errors.state = "State is required";
+  }
+
+  if (Boolean(formData.agreeTerms) !== true) {
+    errors.agreeTerms = "Must agree to terms";
+  }
+
+  return {
+    errors,
+    isValid: Object.keys(errors).length === 0,
+  };
 }

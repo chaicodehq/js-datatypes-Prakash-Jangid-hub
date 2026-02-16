@@ -29,4 +29,25 @@
  */
 export function maskAadhaar(aadhaarNumber) {
   // Your code here
+
+  if (
+    typeof aadhaarNumber !== "string" ||
+    aadhaarNumber.length !== 12 ||
+    /[a-zA-Z]/.test(aadhaarNumber)
+  ) {
+    return "INVALID";
+  }
+
+  let encodedNums = "X".repeat(aadhaarNumber.length - 4);
+
+  let lastDigit = aadhaarNumber.slice(-4);
+
+  let len = Math.floor(encodedNums.length / 2);
+
+  let firstHalf = encodedNums.slice(0, len);
+  let lastHalf = encodedNums.slice(len);
+
+  let result = firstHalf + "-" + lastHalf;
+
+  return result + "-" + lastDigit;
 }

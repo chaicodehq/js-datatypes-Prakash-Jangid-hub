@@ -48,4 +48,84 @@
  */
 export function analyzeUPITransactions(transactions) {
   // Your code here
+
+  if (!Array.isArray(transactions) || transactions.length === 0) {
+    return null;
+  }
+
+  const filteredTransaction = transactions.filter(
+    (val) =>
+      (val.type === "credit" || val.type === "debit") &&
+      typeof val.amount === "number" &&
+      Number.isFinite(val.amount) &&
+      val.amount > 0,
+  );
+
+  if (filteredTransaction.length === 0) {
+    return null;
+  }
+
+  let totalCreditAmount = 0;
+  let totalDebitAmount = 0;
+
+  let highestTransactionAmount = -Infinity;
+  let highestTransaction = null;
+
+  for (const val of filteredTransaction) {
+    if (val.type === "credit") {
+      totalCreditAmount += val.amount;
+    } else {
+      totalDebitAmount += val.amount;
+    }
+
+    if (val.amount > highestTransactionAmount) {
+      highestTransactionAmount = val.amount;
+      highestTransaction = val;
+    }
+  }
+
+  let netBalance = totalCreditAmount - totalDebitAmount;
+
+  let transactionCount = filteredTransaction.length;
+
+  let avgTransaction = Math.round(
+    (totalCreditAmount + totalDebitAmount) / transactionCount,
+  );
+
+  let categoryBreakdown = filteredTransaction.reduce((acc, curr) => {
+    acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
+    return acc;
+  }, {});
+
+  let contactFreqency = filteredTransaction.reduce((acc, curr) => {
+    acc[curr.to] = (acc[curr.to] || 0) + 1;
+    return acc;
+  }, {});
+
+  let frequentContact = null;
+
+  const entries = Object.entries(contactFreqency);
+  if (entries.length > 0) {
+    frequentContact = entries.reduce((acc, curr) =>
+      acc[1] >= curr[1] ? acc : curr,
+    )[0];
+  }
+
+  let allAbove100 = filteredTransaction.every((val) => val.amount > 100);
+  let hasLargeTransaction = filteredTransaction.some(
+    (val) => val.amount >= 5000,
+  );
+
+  return {
+    totalCredit: totalCreditAmount,
+    totalDebit: totalDebitAmount,
+    netBalance,
+    transactionCount,
+    avgTransaction,
+    highestTransaction,
+    categoryBreakdown,
+    frequentContact,
+    allAbove100: allAbove100,
+    hasLargeTransaction: hasLargeTransaction,
+  };
 }
